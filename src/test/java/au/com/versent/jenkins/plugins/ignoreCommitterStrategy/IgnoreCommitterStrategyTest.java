@@ -308,4 +308,62 @@ class IgnoreCommitterStrategyTest {
         assertThat(baos.toString(Charset.defaultCharset()), startsWith("ERROR: Error retrieving SCMFileSystem"));
         assertTrue(result);
     }
+
+    // Tests for checkOnlyHead functionality
+    @Test
+    void testCheckOnlyHeadWithIgnoredAuthorFalse() {
+        strategy = new IgnoreCommitterStrategy(getKnownAuthor(), false);
+        strategy.setCheckOnlyHead(true);
+        boolean result = strategy.isAutomaticBuild(source, head, current, previous, lastSeen, listener);
+        assertThat(baos.toString(Charset.defaultCharset()), containsString("Check only HEAD is enabled"));
+        assertThat(
+                baos.toString(Charset.defaultCharset()),
+                containsString("Commit contains ignored author " + KNOWN_AUTHOR));
+        assertFalse(result);
+    }
+
+    @Test
+    void testCheckOnlyHeadWithIgnoredAuthorTrue() {
+        strategy = new IgnoreCommitterStrategy(getKnownAuthor(), true);
+        strategy.setCheckOnlyHead(true);
+        boolean result = strategy.isAutomaticBuild(source, head, current, previous, lastSeen, listener);
+        assertThat(baos.toString(Charset.defaultCharset()), containsString("Check only HEAD is enabled"));
+        // With checkOnlyHead=true and allowBuildIfNotExcludedAuthor=true, if HEAD author is ignored, build should not
+        // be triggered
+        assertFalse(result);
+    }
+
+    @Test
+    void testCheckOnlyHeadWithNonIgnoredAuthorTrue() {
+        strategy = new IgnoreCommitterStrategy(getUnknownAuthor(), true);
+        strategy.setCheckOnlyHead(true);
+        boolean result = strategy.isAutomaticBuild(source, head, current, previous, lastSeen, listener);
+        assertThat(baos.toString(Charset.defaultCharset()), containsString("Check only HEAD is enabled"));
+        assertThat(
+                baos.toString(Charset.defaultCharset()),
+                containsString("Commit contains non ignored author " + KNOWN_AUTHOR));
+        assertTrue(result);
+    }
+
+    @Test
+    void testCheckOnlyHeadWithNonIgnoredAuthorFalse() {
+        strategy = new IgnoreCommitterStrategy(getUnknownAuthor(), false);
+        strategy.setCheckOnlyHead(true);
+        boolean result = strategy.isAutomaticBuild(source, head, current, previous, lastSeen, listener);
+        assertThat(baos.toString(Charset.defaultCharset()), containsString("Check only HEAD is enabled"));
+        // With checkOnlyHead=true and allowBuildIfNotExcludedAuthor=false, if HEAD author is not ignored, build should
+        // be triggered
+        assertTrue(result);
+    }
+
+    @Test
+    void testCheckOnlyHeadWithEmptyLogs() {
+        strategy = new IgnoreCommitterStrategy(getKnownAuthor(), false);
+        strategy.setCheckOnlyHead(true);
+        // Test case where checkOnlyHead=true but no commits exist between current and lastSeen (empty logs)
+        // This covers the branch where Boolean.TRUE.equals(checkOnlyHead) && !logs.isEmpty() evaluates to false
+        boolean result = strategy.isAutomaticBuild(source, head, current, current, current, listener);
+        // With empty logs, should fall through to original logic and return true (default behavior)
+        assertTrue(result);
+    }
 }

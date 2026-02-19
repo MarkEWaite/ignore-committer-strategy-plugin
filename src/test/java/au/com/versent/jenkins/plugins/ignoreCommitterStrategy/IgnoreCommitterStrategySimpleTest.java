@@ -25,6 +25,7 @@ package au.com.versent.jenkins.plugins.ignoreCommitterStrategy;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,6 +33,7 @@ class IgnoreCommitterStrategySimpleTest {
 
     private String ignoredAuthors = "";
     private boolean allowBuildIfNotExcludedAuthor = false;
+    private boolean checkOnlyHead = false;
     private IgnoreCommitterStrategy strategy =
             new IgnoreCommitterStrategy(ignoredAuthors, allowBuildIfNotExcludedAuthor);
 
@@ -57,5 +59,20 @@ class IgnoreCommitterStrategySimpleTest {
         allowBuildIfNotExcludedAuthor = !allowBuildIfNotExcludedAuthor;
         strategy = new IgnoreCommitterStrategy(ignoredAuthors, allowBuildIfNotExcludedAuthor);
         assertThat(strategy.getAllowBuildIfNotExcludedAuthor(), is(allowBuildIfNotExcludedAuthor));
+    }
+
+    @Test
+    void testGetCheckOnlyHead() {
+        assertFalse(strategy.getCheckOnlyHead());
+        strategy.setCheckOnlyHead(false);
+        assertFalse(strategy.getCheckOnlyHead());
+    }
+
+    @Test
+    void testGetCheckOnlyHeadTrue() {
+        checkOnlyHead = true;
+        strategy = new IgnoreCommitterStrategy(ignoredAuthors, allowBuildIfNotExcludedAuthor);
+        strategy.setCheckOnlyHead(checkOnlyHead);
+        assertThat(strategy.getCheckOnlyHead(), is(checkOnlyHead));
     }
 }
