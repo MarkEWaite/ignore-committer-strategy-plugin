@@ -41,18 +41,17 @@ import jenkins.plugins.git.AbstractGitSCMSource;
 import jenkins.plugins.git.GitSCMFileSystem;
 import jenkins.scm.api.*;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 
 public class IgnoreCommitterStrategy extends BranchBuildStrategy {
     private final String ignoredAuthors;
     private final Boolean allowBuildIfNotExcludedAuthor;
-    private final Boolean checkOnlyHead;
+    private Boolean checkOnlyHead = false;
 
     @DataBoundConstructor
-    public IgnoreCommitterStrategy(
-            String ignoredAuthors, Boolean allowBuildIfNotExcludedAuthor, Boolean checkOnlyHead) {
+    public IgnoreCommitterStrategy(String ignoredAuthors, Boolean allowBuildIfNotExcludedAuthor) {
         this.ignoredAuthors = ignoredAuthors;
         this.allowBuildIfNotExcludedAuthor = allowBuildIfNotExcludedAuthor;
-        this.checkOnlyHead = checkOnlyHead;
     }
 
     /**
@@ -70,6 +69,15 @@ public class IgnoreCommitterStrategy extends BranchBuildStrategy {
      */
     public Boolean getAllowBuildIfNotExcludedAuthor() {
         return allowBuildIfNotExcludedAuthor;
+    }
+
+    /**
+     * Check only the latest commit instead of all commits in the changeset.
+     * @param checkOnlyHead if true, then only the latest commit is checked
+     */
+    @DataBoundSetter
+    public void setCheckOnlyHead(boolean checkOnlyHead) {
+        this.checkOnlyHead = checkOnlyHead;
     }
 
     /**

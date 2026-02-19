@@ -34,7 +34,7 @@ class IgnoreCommitterStrategySimpleTest {
     private boolean allowBuildIfNotExcludedAuthor = false;
     private boolean checkOnlyHead = false;
     private IgnoreCommitterStrategy strategy =
-            new IgnoreCommitterStrategy(ignoredAuthors, allowBuildIfNotExcludedAuthor, checkOnlyHead);
+            new IgnoreCommitterStrategy(ignoredAuthors, allowBuildIfNotExcludedAuthor);
 
     @Test
     void testGetIgnoredAuthors() {
@@ -47,28 +47,31 @@ class IgnoreCommitterStrategySimpleTest {
     }
 
     @Test
-    void testGetCheckOnlyHead() {
-        assertThat(strategy.getCheckOnlyHead(), is(checkOnlyHead));
-    }
-
-    @Test
     void testGetIgnoredAuthorsNonEmpty() {
         ignoredAuthors = "ignored@example.com";
-        strategy = new IgnoreCommitterStrategy(ignoredAuthors, allowBuildIfNotExcludedAuthor, false);
+        strategy = new IgnoreCommitterStrategy(ignoredAuthors, allowBuildIfNotExcludedAuthor);
         assertThat(strategy.getIgnoredAuthors(), is(ignoredAuthors));
     }
 
     @Test
     void testGetAllowBuildIfNotExcludedAuthorNegation() {
         allowBuildIfNotExcludedAuthor = !allowBuildIfNotExcludedAuthor;
-        strategy = new IgnoreCommitterStrategy(ignoredAuthors, allowBuildIfNotExcludedAuthor, false);
+        strategy = new IgnoreCommitterStrategy(ignoredAuthors, allowBuildIfNotExcludedAuthor);
         assertThat(strategy.getAllowBuildIfNotExcludedAuthor(), is(allowBuildIfNotExcludedAuthor));
+    }
+
+    @Test
+    void testGetCheckOnlyHead() {
+        assertFalse(strategy.getCheckOnlyHead());
+        strategy.setCheckOnlyHead(false);
+        assertFalse(strategy.getCheckOnlyHead());
     }
 
     @Test
     void testGetCheckOnlyHeadTrue() {
         checkOnlyHead = true;
-        strategy = new IgnoreCommitterStrategy(ignoredAuthors, allowBuildIfNotExcludedAuthor, checkOnlyHead);
+        strategy = new IgnoreCommitterStrategy(ignoredAuthors, allowBuildIfNotExcludedAuthor);
+        strategy.setCheckOnlyHead(checkOnlyHead);
         assertThat(strategy.getCheckOnlyHead(), is(checkOnlyHead));
     }
 }
