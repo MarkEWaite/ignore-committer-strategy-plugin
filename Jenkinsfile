@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Greetings') {
             steps {
-                echo 'Hello World from MarkWaite@yahoo.com'
+                echo 'Hello World from MarkWaite@yahoo.com in a new commit'
             }
         }
     }
